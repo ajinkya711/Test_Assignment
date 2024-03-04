@@ -1,0 +1,26 @@
+name: Deployment Pipeline
+
+on:
+  workflow_run:
+    workflows: CI build pipeline
+    branches: [master,develop]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: GitHubDemoVM
+    
+    steps:
+      - name: Download build artifact
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          name: my-artifacts
+          workflow: CI Build Pipeline.yml
+          path: build_artifacts
+          
+      - name: Deploy to GitHubActionDemo site
+        run: |
+          iisreset /stop
+          xcopy /s /y .\build_artifacts\* C:\inetpub\wwwroot\GitHubActionDemo
+          iisreset /start

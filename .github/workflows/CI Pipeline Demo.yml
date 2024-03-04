@@ -1,0 +1,30 @@
+name: CI Pipeline Demo
+
+on:
+  push:
+    branches:
+      develop
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4.1.1
+
+      - name: Build dotnet code
+        working-directory: ./dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        working-directory: ./dotnet
+        run: |
+          dotnet publish -c Release -o ./myapp
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4.3.1
+        with: 
+          name: my-artifacts
+          path: ./dotnet/myapp
+        
