@@ -1,0 +1,32 @@
+name: CI Build Pipeline
+
+on: 
+  workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4.1.1
+
+      - name: Set up .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '6.0.x'
+          include-prerelease: true
+
+      - name: Build with dotnet
+        working-directory: ./dotnet
+        run: dotnet build --configuration Release
+
+      - name: dotnet publish
+        working-directory: ./dotnet
+        run: dotnet publish -c Release -o ./myapp
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4.3.1
+        with:
+          name: my-artifacts
+          path: ./dotnet/myapp
+        
